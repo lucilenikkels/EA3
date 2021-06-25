@@ -120,5 +120,5 @@ def q2b(run=False, name="run.json"):
 
 
 #q2a(False, "run02.json")
-q2b(True, "run02.json")
+q2b(True, "run03.json")
 #run_moeda(20, 100, True)
