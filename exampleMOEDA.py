@@ -94,28 +94,26 @@ def q2b(run=False, name="run.json"):
 				result[ea][problem]["means"].append(res)
 				with open("results/b/"+name, "w") as f:
 					json.dump(result, f, indent=4)
-			ub_v = result[ea][problem]["means"][-1]
-			lb_v = result[ea][problem]["means"][-2]
-			if abs(ub_v-lb_v) < 0.0000000000001:
-				lb_v = result[ea][problem]["means"][-3]
+			prev = result[ea][problem]["means"][-1]
+			if abs(ub_v-result[ea][problem]["means"][-2]) < 0.0000000000001:
 				ub = result[ea][problem]["sizes"][-2]
 				lb = result[ea][problem]["sizes"][-3]
 				print("They are the same")
 			else:
 				ub = result[ea][problem]["sizes"][-1]
 				lb = result[ea][problem]["sizes"][-2]
-			start = True
-			while (lb_v*precision >= abs(ub_v-lb_v)) or start:
-				start = False
-				if ub == lb:
-					lb = int(lb*3/4)
+			while ub-lb > 2:
 				size = int((ub+lb)/2)
 				fitness, evals, _, _ = run_reliably(5, problem, size, ea == "normal")
 				res = np.mean(fitness)
 				result[ea][problem]["sizes"].append(size)
 				result[ea][problem]["means"].append(res)
-				ub = size
-				ub_v = res
+				if res >= prev-prev*precision:
+					prev = res
+					ub = size
+				else:
+					lb = size
+					prev = res
 				with open("results/b/"+name, "w") as f:
 					json.dump(result, f, indent=4)
 			plt.scatter(result[ea][problem]["sizes"], result[ea][problem]["means"])
@@ -123,5 +121,5 @@ def q2b(run=False, name="run.json"):
 
 
 #q2a(True, "run04.json")
-q2b(True, "run04.json")
+q2b(True, "run05.json")
 #run_moeda(20, 100, True)
