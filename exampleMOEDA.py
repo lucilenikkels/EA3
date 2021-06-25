@@ -96,14 +96,17 @@ def q2b(run=False, name="run.json"):
 					json.dump(result, f, indent=4)
 			ub_v = result[ea][problem]["means"][-1]
 			lb_v = result[ea][problem]["means"][-2]
-			if ub_v == lb_v:
+			if abs(ub_v-lb_v) < 0.0000000000001:
 				lb_v = result[ea][problem]["means"][-3]
 				ub = result[ea][problem]["sizes"][-2]
 				lb = result[ea][problem]["sizes"][-3]
+				print("They are the same")
 			else:
 				ub = result[ea][problem]["sizes"][-1]
 				lb = result[ea][problem]["sizes"][-2]
-			while lb_v*precision >= abs(ub_v-lb_v):
+			start = True
+			while (lb_v*precision >= abs(ub_v-lb_v)) or start:
+				start = False
 				if ub == lb:
 					lb = int(lb*3/4)
 				size = int((ub+lb)/2)
@@ -119,6 +122,6 @@ def q2b(run=False, name="run.json"):
 	plt.show()
 
 
-#q2a(False, "run02.json")
-q2b(True, "run03.json")
+#q2a(True, "run04.json")
+q2b(True, "run04.json")
 #run_moeda(20, 100, True)

@@ -70,13 +70,12 @@ class MOEDA:
         # Stored if the solution dominates at least one other
         dominated = False
         for elite in self.elitistArchive:
-            e_obj1, e_obj2 = elite.fitness
-            sol_dominates = (obj1 >= e_obj1 and obj2 >= e_obj2) and (obj1 > e_obj1 or obj2 > e_obj2)
-            if sol_dominates:
+            sol_dominates = dominates(solution.fitness, elite.fitness)
+            if sol_dominates == 1:
                 self.elitistArchive.add(solution)
                 break
-            el_dominates = (obj1 <= e_obj1 and obj2 <= e_obj2) and (obj1 < e_obj1 or obj2 < e_obj2)
-            dominated = dominated or el_dominates
+            elif sol_dominates == -1:
+                dominated = True
 
         # Stored also if the solution is not dominated by any other
         if not dominated:
