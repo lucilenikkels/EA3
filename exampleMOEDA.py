@@ -95,7 +95,7 @@ def q2b(run=False, name="run.json"):
 				with open("results/b/"+name, "w") as f:
 					json.dump(result, f, indent=4)
 			prev = result[ea][problem]["means"][-1]
-			if abs(ub_v-result[ea][problem]["means"][-2]) < 0.0000000000001:
+			if abs(prev-result[ea][problem]["means"][-2]) < 0.0000000000001:
 				ub = result[ea][problem]["sizes"][-2]
 				lb = result[ea][problem]["sizes"][-3]
 				print("They are the same")
