@@ -33,7 +33,7 @@ def run_reliably(reps=5, L=20, populationSize=100, use_archive=False):
 	x_coords = []
 	y_coords = []
 	for i in range(reps):
-		print("Run "+str(i+1)+" out of "+str(reps)+" (L="+str(L)+", pop="+str(populationSize)+")")
+		print("Run "+str(i+1)+" out of "+str(reps)+" (L="+str(L)+", pop="+str(populationSize)+", archive="+str(use_archive)+")")
 		vs, es, fx_coords, fy_coords = run_moeda(L, populationSize, use_archive)
 		volumes.append(vs)
 		evals.append(es)
@@ -76,6 +76,7 @@ def q2b(run=False, name="run.json"):
 	result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
 			  "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
 	variants = ["normal", "archive"]
+	precision = 0.00001
 	for problem in PROBLEMS:
 		for ea in variants:
 			plt.figure()
@@ -84,7 +85,7 @@ def q2b(run=False, name="run.json"):
 			last_val = -1.0
 			res = 0.0
 			size = 4
-			while last_val*0.0001 <= abs(res-last_val) and size != 10**4:
+			while last_val*precision <= abs(res-last_val) and size != 10**4:
 				last_val = res
 				size = min(size*2, 10**4)
 				fitness, evals, _, _ = run_reliably(5, problem, size, ea=="normal")
@@ -102,7 +103,9 @@ def q2b(run=False, name="run.json"):
 			else:
 				ub = result[ea][problem]["sizes"][-1]
 				lb = result[ea][problem]["sizes"][-2]
-			while lb_v*0.0001 >= abs(ub_v-lb_v):
+			while lb_v*precision >= abs(ub_v-lb_v):
+				if ub == lb:
+					lb = int(lb*3/4)
 				size = int((ub+lb)/2)
 				fitness, evals, _, _ = run_reliably(5, problem, size, ea == "normal")
 				res = np.mean(fitness)
