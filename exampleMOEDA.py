@@ -88,7 +88,7 @@ def q2b(run=False, name="run.json"):
 			while last_val*precision <= abs(res-last_val) and size != 10**4:
 				last_val = res
 				size = min(size*2, 10**4)
-				fitness, evals, _, _ = run_reliably(5, problem, size, ea=="normal")
+				fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
 				result[ea][problem]["sizes"].append(size)
 				res = np.mean(fitness)
 				result[ea][problem]["means"].append(res)
@@ -104,7 +104,7 @@ def q2b(run=False, name="run.json"):
 				lb = result[ea][problem]["sizes"][-2]
 			while ub-lb > 2:
 				size = int((ub+lb)/2)
-				fitness, evals, _, _ = run_reliably(5, problem, size, ea == "normal")
+				fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
 				res = np.mean(fitness)
 				result[ea][problem]["sizes"].append(size)
 				result[ea][problem]["means"].append(res)
