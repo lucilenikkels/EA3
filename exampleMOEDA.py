@@ -205,6 +205,7 @@ def q3(group_sizes, run=False, name="run01", archive=True):
         if run:
             p_fitness, p_evals, _, _ = run_reliably(1, problem, group_sizes[i], archive)
             fitness, evals, std = summary(p_evals, p_fitness)
+            print(fitness)
             result[problem]["xs"] = evals
             result[problem]["means"] = fitness
             result[problem]["stds"] = std
@@ -222,11 +223,11 @@ def q3(group_sizes, run=False, name="run01", archive=True):
                 with open("results/group/" + name + ".json", "r") as f:
                     result = json.load(f)
         #ax.plot(result[problem]["xs"], result[problem]["means"], label="archive="+str(archive))
-        upper = []
-        lower = []
-        for y in range(len(result[problem]["means"])):
-            upper.append(result[problem]["means"][y] + result[problem]["stds"][y])
-            lower.append(result[problem]["means"][y] - result[problem]["stds"][y])
+        #upper = []
+        #lower = []
+        #for y in range(len(result[problem]["means"])):
+        #    upper.append(result[problem]["means"][y] + result[problem]["stds"][y])
+        #    lower.append(result[problem]["means"][y] - result[problem]["stds"][y])
         #ax.fill_between(result[problem]["xs"], upper, lower, alpha=0.3)
         #ax.legend()
     #plt.show()
