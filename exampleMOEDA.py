@@ -10,7 +10,7 @@ import numpy as np
 #print('#feval:', EA.numberOfEvaluationsByGeneration) #print array of #feval
 #sizes of EA.hyperVolumeByGeneration and EA.numberOfEvaluationsByGeneration are equal
 
-PROBLEMS = [5, 10, 20]
+PROBLEMS = [10]
 
 
 def run_moeda(L, populationSize, use_archive):
@@ -55,7 +55,9 @@ def sort_convergence(evals, fitness):
 
 
 def summary(p_evals, p_fitness):
-    evals, fitness = sort_convergence(p_evals, p_fitness)
+    f_evals = [item for sublist in p_evals for item in sublist]
+    f_fitness = [item for sublist in p_fitness for item in sublist]
+    evals, fitness = sort_convergence(f_evals, f_fitness)
     eval_final = []
     fitness_final = []
     stds = []
@@ -89,9 +91,7 @@ def q2a(run=False, name="run.json"):
     eas = ["normal", "archive"]
     labels = ["W/o archive", "W archive"]
     for i in range(len(eas)):
-        evals = [item for sublist in results[eas[i]]["evals"] for item in sublist]
-        fitness = [item for sublist in results[eas[i]]["fitness"] for item in sublist]
-        x_graph, y_graph, std = summary(evals, fitness)
+        x_graph, y_graph, std = summary(results[eas[i]]["evals"], results[eas[i]]["fitness"])
         plt.plot(x_graph, y_graph, label=labels[i])
         upper = []
         lower = []
@@ -110,7 +110,7 @@ def q2a(run=False, name="run.json"):
 def q2b(run=False, name="run.json"):
     result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
               "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
-    variants = ["archive"]
+    variants = ["normal"]
     precisions = [0.001, 0.00001]
     for problem in PROBLEMS:
         plt.figure()
@@ -160,14 +160,83 @@ def q2b(run=False, name="run.json"):
     plt.show()
 
 
-def q2c(name="run.json"):
-    return 0
+def q2c(run=False, name="run.json"):
+    sizes = []
+    eas = ["normal", "archive"]
+    result = {'normal': {L: {} for L in PROBLEMS}, 'archive': {L: {} for L in PROBLEMS}}
+    fig, axs = plt.subplots(1, 3)
+    for i, problem in enumerate(PROBLEMS):
+        ax = axs[i]
+        ax.title("L=" + str(problem), fontsize=20)
+        ax.xlabel("Evaluations", fontsize=20)
+        ax.ylabel("Hypervolume", fontsize=20)
+        ax.yscale('log')
+        for ea in eas:
+            if run:
+                p_fitness, p_evals, _, _ = run_reliably(5, problem, sizes[i], ea=="archive")
+                fitness, evals, std = summary(p_evals, p_fitness)
+                result[ea][str(problem)]["xs"] = evals
+                result[ea][str(problem)]["means"] = fitness
+                result[ea][str(problem)]["stds"] = std
+                with open("results/c/" + name, "w") as f:
+                    result = json.dump(result, f, indent=4)
+            else:
+                with open("results/c/" + name, "r") as f:
+                    result = json.load(f)
+            ax.plot(result[ea][str(problem)]["xs"], result[ea][str(problem)]["means"], label="archive=" + ea)
+            upper = []
+            lower = []
+            for y in range(len(result[ea][str(problem)]["means"])):
+                upper.append(result[ea][str(problem)]["means"][y] + result[ea][str(problem)]["stds"][y])
+                lower.append(result[ea][str(problem)]["means"][y] - result[ea][str(problem)]["stds"][y])
+            plt.fill_between(result[ea][str(problem)]["xs"], upper, lower, alpha=0.3)
+        ax.legend(fontsize=18)
+    plt.show()
+
+
+def q3(run=False, name="run01", archive=True):
+    group_problems = [15, 30, 60]
+    group_sizes = []
+    result = {L: {} for L in group_problems}
+    fig, axs = plt.subplots(1, 3)
+    for i, problem in enumerate(group_problems):
+        ax = axs[i]
+        ax.title("L=" + str(problem))
+        ax.yscale('log')
+        if run:
+            p_fitness, p_evals, _, _ = run_reliably(5, problem, group_sizes[i], archive)
+            fitness, evals, std = summary(p_evals, p_fitness)
+            result[str(problem)]["xs"] = evals
+            result[str(problem)]["means"] = fitness
+            result[str(problem)]["stds"] = std
+            if archive:
+                with open("results/group/" + name + "_archive.json", "w") as f:
+                    result = json.dump(result, f, indent=4)
+            else:
+                with open("results/group/" + name + ".json", "w") as f:
+                    result = json.dump(result, f, indent=4)
+        else:
+            if archive:
+                with open("results/group/" + name + "_archive.json", "r") as f:
+                    result = json.load(f)
+            else:
+                with open("results/group/" + name + ".json", "r") as f:
+                    result = json.load(f)
+        ax.plot(result[str(problem)]["xs"], result[str(problem)]["means"], label="archive="+str(archive))
+        upper = []
+        lower = []
+        for y in range(len(result[str(problem)]["means"])):
+            upper.append(result[str(problem)]["means"][y] + result[str(problem)]["stds"][y])
+            lower.append(result[str(problem)]["means"][y] - result[str(problem)]["stds"][y])
+        plt.fill_between(result[str(problem)]["xs"], upper, lower, alpha=0.3)
+        ax.legend()
+    plt.show()
 
 
 #q2a(True, "run06.json")
-q2b(True, "run16.json")
+q2b(True, "run17.json")
 #run_moeda(20, 100, True)
 
 # 11 contains correct version of L=5 without archive (p=0.001)
 # 15 contains correct versions of L=10, L=20 without archive (p=0.001)
-
+# 16 contains versions of all L with elitist archive, p=0.001
