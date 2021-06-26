@@ -10,7 +10,7 @@ import numpy as np
 #print('#feval:', EA.numberOfEvaluationsByGeneration) #print array of #feval
 #sizes of EA.hyperVolumeByGeneration and EA.numberOfEvaluationsByGeneration are equal
 
-PROBLEMS = [20]
+PROBLEMS = [5, 10, 20]
 
 
 def run_moeda(L, populationSize, use_archive):
@@ -111,49 +111,55 @@ def q2b(run=False, name="run.json"):
     result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
               "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
     variants = ["normal", "archive"]
-    precision = 0.0001
+    precisions = [0.001, 0.0001]
     for problem in PROBLEMS:
-        for ea in variants:
-            plt.figure()
+        plt.figure()
+        for idx, ea in enumerate(variants):
+            precision = precisions[idx]
             plt.title(ea+": L="+str(problem))
             plt.yscale('log')
             last_val = -1.0
             res = 0.0
             size = 4
-            while last_val*precision <= abs(res-last_val) and size != 9999:
-                last_val = res
-                size = min(size*2, 9999)
-                fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
-                result[ea][problem]["sizes"].append(size)
-                res = np.mean(fitness)
-                result[ea][problem]["means"].append(res)
-                with open("results/b/"+name, "w") as f:
-                    json.dump(result, f, indent=4)
-            prev = result[ea][problem]["means"][-1]
-            if abs(prev-result[ea][problem]["means"][-2]) < 0.0000000000001:
-                ub = result[ea][problem]["sizes"][-2]
-                lb = result[ea][problem]["sizes"][-3]
-                print("They are the same")
-            else:
-                ub = result[ea][problem]["sizes"][-1]
-                lb = result[ea][problem]["sizes"][-2]
-            while ub-lb > 2:
-                size = int((ub+lb)/2)
-                fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
-                res = np.mean(fitness)
-                result[ea][problem]["sizes"].append(size)
-                result[ea][problem]["means"].append(res)
-                if res >= prev-prev*precision:
-                    prev = res
-                    ub = size
+            if run:
+                while last_val*precision <= abs(res-last_val) and size != 9999:
+                    last_val = res
+                    size = min(size*2, 9999)
+                    fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
+                    result[ea][problem]["sizes"].append(size)
+                    res = np.mean(fitness)
+                    result[ea][problem]["means"].append(res)
+                    with open("results/b/"+name, "w") as f:
+                        json.dump(result, f, indent=4)
+                prev = result[ea][problem]["means"][-1]
+                if abs(prev-result[ea][problem]["means"][-2]) < 0.0000000000001:
+                    ub = result[ea][problem]["sizes"][-2]
+                    lb = result[ea][problem]["sizes"][-3]
+                    print("They are the same")
                 else:
-                    lb = size
-                with open("results/b/"+name, "w") as f:
-                    json.dump(result, f, indent=4)
-            plt.scatter(result[ea][problem]["sizes"], result[ea][problem]["means"])
+                    ub = result[ea][problem]["sizes"][-1]
+                    lb = result[ea][problem]["sizes"][-2]
+                while ub-lb > 2:
+                    size = int((ub+lb)/2)
+                    fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
+                    res = np.mean(fitness)
+                    result[ea][problem]["sizes"].append(size)
+                    result[ea][problem]["means"].append(res)
+                    if res >= prev-prev*precision:
+                        prev = res
+                        ub = size
+                    else:
+                        lb = size
+                    with open("results/b/"+name, "w") as f:
+                        json.dump(result, f, indent=4)
+            else:
+                with open("results/b/" + name, "r") as f:
+                    result = json.load(f)
+            plt.scatter(result[ea][str(problem)]["sizes"], result[ea][str(problem)]["means"], label=ea)
+        plt.legend()
     plt.show()
 
 
 #q2a(False, "run05.json")
-q2b(True, "run10.json")
+q2b(True, "run11.json")
 #run_moeda(20, 100, True)
