@@ -120,6 +120,6 @@ def q2b(run=False, name="run.json"):
 	plt.show()
 
 
-q2a(True, "run08.json")
-#q2b(True, "run05.json")
+#q2a(True, "run06.json")
+q2b(True, "run08.json")
 #run_moeda(20, 100, True)
