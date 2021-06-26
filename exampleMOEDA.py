@@ -195,6 +195,7 @@ def q2c(run=False, name="run.json"):
 
 
 def q3(group_sizes, run=False, name="run01", archive=True):
+    print(archive)
     group_problems = [15, 30, 60]
     result = {L: {} for L in group_problems}
     fig, axs = plt.subplots(1, 3)
@@ -203,7 +204,7 @@ def q3(group_sizes, run=False, name="run01", archive=True):
         ax.set_title("L=" + str(problem))
         ax.set_yscale('log')
         if run:
-            p_fitness, p_evals, _, _ = run_reliably(1, problem, group_sizes[i], archive)
+            p_fitness, p_evals, _, _ = run_reliably(5, problem, group_sizes[i], archive)
             fitness, evals, std = summary(p_evals, p_fitness)
             result[problem]["xs"] = evals
             result[problem]["means"] = fitness
@@ -233,7 +234,7 @@ def q3(group_sizes, run=False, name="run01", archive=True):
 
 
 #q2a(True, "run06.json")
-q3([1987, 4610, 9854], True, "run01", archive=False)
+q3(group_sizes=[1987, 4610, 9854], run=True, name="run01", archive=False)
 q2b(True, "run19.json")
 
 sizes = [[116, 1028, 5552], [1987, 4610, 9854]]
