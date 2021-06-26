@@ -197,7 +197,7 @@ def q2c(run=False, name="run.json"):
 def q3(group_sizes, run=False, name="run01", archive=True):
     print(archive)
     group_problems = [15, 30, 60]
-    result = {L: {} for L in group_problems}
+    result = {15: {}, 30: {}, 60: {}}
     fig, axs = plt.subplots(1, 3)
     for i, problem in enumerate(group_problems):
         # ax = axs[i]
