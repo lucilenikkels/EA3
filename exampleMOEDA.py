@@ -111,7 +111,7 @@ def q2b(run=False, name="run.json"):
     result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
               "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
     variants = ["normal", "archive"]
-    precision = 0.001
+    precision = 0.0001
     for problem in PROBLEMS:
         for ea in variants:
             plt.figure()
@@ -148,7 +148,6 @@ def q2b(run=False, name="run.json"):
                     ub = size
                 else:
                     lb = size
-                    prev = res
                 with open("results/b/"+name, "w") as f:
                     json.dump(result, f, indent=4)
             plt.scatter(result[ea][problem]["sizes"], result[ea][problem]["means"])
@@ -156,5 +155,5 @@ def q2b(run=False, name="run.json"):
 
 
 #q2a(False, "run05.json")
-q2b(True, "run09.json")
+q2b(True, "run10.json")
 #run_moeda(20, 100, True)
