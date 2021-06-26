@@ -10,7 +10,7 @@ import numpy as np
 #print('#feval:', EA.numberOfEvaluationsByGeneration) #print array of #feval
 #sizes of EA.hyperVolumeByGeneration and EA.numberOfEvaluationsByGeneration are equal
 
-PROBLEMS = [5, 10, 20]
+PROBLEMS = [10, 20]
 
 
 def run_moeda(L, populationSize, use_archive):
@@ -155,11 +155,13 @@ def q2b(run=False, name="run.json"):
             else:
                 with open("results/b/" + name, "r") as f:
                     result = json.load(f)
-            plt.scatter(result[ea][str(problem)]["sizes"], result[ea][str(problem)]["means"], label=ea)
+            # plt.scatter(result[ea][str(problem)]["sizes"], result[ea][str(problem)]["means"], label=ea)
         plt.legend()
     plt.show()
 
 
 #q2a(False, "run05.json")
-q2b(True, "run11.json")
+q2b(True, "run12.json")
 #run_moeda(20, 100, True)
+
+# 11 contains correct version of L=5 without archive
