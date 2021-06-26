@@ -161,8 +161,8 @@ def q2b(run=False, name="run.json"):
 
 
 def q2c(run=False, name="run.json"):
-    sizes = []
-    eas = ["normal", "archive"]
+    sizes = [8, 12, 320]
+    eas = [{name: "normal", sizes: [288, 1040, 2866]}, {name: "archive", sizes: [8, 12, 320]}]
     result = {'normal': {L: {} for L in PROBLEMS}, 'archive': {L: {} for L in PROBLEMS}}
     fig, axs = plt.subplots(1, 3)
     for i, problem in enumerate(PROBLEMS):
@@ -173,30 +173,29 @@ def q2c(run=False, name="run.json"):
         ax.yscale('log')
         for ea in eas:
             if run:
-                p_fitness, p_evals, _, _ = run_reliably(5, problem, sizes[i], ea=="archive")
+                p_fitness, p_evals, _, _ = run_reliably(5, problem, ea["sizes"][i], ea["name"]=="archive")
                 fitness, evals, std = summary(p_evals, p_fitness)
-                result[ea][str(problem)]["xs"] = evals
-                result[ea][str(problem)]["means"] = fitness
-                result[ea][str(problem)]["stds"] = std
+                result[ea["name"]][str(problem)]["xs"] = evals
+                result[ea["name"]][str(problem)]["means"] = fitness
+                result[ea["name"]][str(problem)]["stds"] = std
                 with open("results/c/" + name, "w") as f:
                     result = json.dump(result, f, indent=4)
             else:
                 with open("results/c/" + name, "r") as f:
                     result = json.load(f)
-            ax.plot(result[ea][str(problem)]["xs"], result[ea][str(problem)]["means"], label="archive=" + ea)
+            ax.plot(result[ea["name"]][str(problem)]["xs"], result[ea["name"]][str(problem)]["means"], label="archive=" + ea["name"])
             upper = []
             lower = []
-            for y in range(len(result[ea][str(problem)]["means"])):
-                upper.append(result[ea][str(problem)]["means"][y] + result[ea][str(problem)]["stds"][y])
-                lower.append(result[ea][str(problem)]["means"][y] - result[ea][str(problem)]["stds"][y])
-            plt.fill_between(result[ea][str(problem)]["xs"], upper, lower, alpha=0.3)
+            for y in range(len(result[ea["name"]][str(problem)]["means"])):
+                upper.append(result[ea["name"]][str(problem)]["means"][y] + result[ea["name"]][str(problem)]["stds"][y])
+                lower.append(result[ea["name"]][str(problem)]["means"][y] - result[ea["name"]][str(problem)]["stds"][y])
+            plt.fill_between(result[ea["name"]][str(problem)]["xs"], upper, lower, alpha=0.3)
         ax.legend(fontsize=18)
     plt.show()
 
 
-def q3(run=False, name="run01", archive=True):
+def q3(group_sizes, run=False, name="run01", archive=True):
     group_problems = [15, 30, 60]
-    group_sizes = []
     result = {L: {} for L in group_problems}
     fig, axs = plt.subplots(1, 3)
     for i, problem in enumerate(group_problems):
@@ -234,8 +233,12 @@ def q3(run=False, name="run01", archive=True):
 
 
 #q2a(True, "run06.json")
-q2b(True, "run18.json")
+#q2b(True, "run18.json")
 #run_moeda(20, 100, True)
+lst = [True, False]
+sizes = [[116, 1028, 5552], [1987, 4610, 9854]]
+for idx, b in enumerate(lst):
+    q3(sizes[idx], True, "run01", b)
 
 # 11 contains correct version of L=5 without archive (p=0.001)
 # 15 contains correct versions of L=10, L=20 without archive (p=0.001)
