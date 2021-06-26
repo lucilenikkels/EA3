@@ -55,9 +55,9 @@ def sort_convergence(evals, fitness):
 
 
 def summary(p_evals, p_fitness):
-    #f_evals = [item for sublist in p_evals for item in sublist]
-    #f_fitness = [item for sublist in p_fitness for item in sublist]
-    evals, fitness = sort_convergence(p_evals, p_fitness)
+    f_evals = [item for sublist in p_evals for item in sublist]
+    f_fitness = [item for sublist in p_fitness for item in sublist]
+    evals, fitness = sort_convergence(f_evals, f_fitness)
     eval_final = []
     fitness_final = []
     stds = []
