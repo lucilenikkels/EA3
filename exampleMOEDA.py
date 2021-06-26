@@ -10,7 +10,7 @@ import numpy as np
 #print('#feval:', EA.numberOfEvaluationsByGeneration) #print array of #feval
 #sizes of EA.hyperVolumeByGeneration and EA.numberOfEvaluationsByGeneration are equal
 
-PROBLEMS = [10, 20]
+PROBLEMS = [5, 10, 20]
 
 
 def run_moeda(L, populationSize, use_archive):
@@ -122,7 +122,7 @@ def q2b(run=False, name="run.json"):
             res = 0.0
             size = 4
             if run:
-                while last_val*precision <= abs(res-last_val) and size != 9999:
+                while abs(res-last_val) > precision and size != 9999:
                     last_val = res
                     size = min(size*2, 9999)
                     fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
@@ -145,7 +145,7 @@ def q2b(run=False, name="run.json"):
                     res = np.mean(fitness)
                     result[ea][problem]["sizes"].append(size)
                     result[ea][problem]["means"].append(res)
-                    if res >= prev-prev*precision:
+                    if res >= prev-precision:
                         prev = res
                         ub = size
                     else:
@@ -161,7 +161,7 @@ def q2b(run=False, name="run.json"):
 
 
 #q2a(False, "run05.json")
-q2b(True, "run12.json")
+q2b(True, "run14.json")
 #run_moeda(20, 100, True)
 
 # 11 contains correct version of L=5 without archive
