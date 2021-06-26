@@ -120,7 +120,7 @@ def q2b(run=False, name="run.json"):
             plt.yscale('log')
             last_val = -1.0
             res = 0.0
-            size = 4
+            size = 1
             if run:
                 while abs(res-last_val) > precision and size != 9999:
                     last_val = res
