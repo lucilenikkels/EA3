@@ -10,7 +10,7 @@ import numpy as np
 #print('#feval:', EA.numberOfEvaluationsByGeneration) #print array of #feval
 #sizes of EA.hyperVolumeByGeneration and EA.numberOfEvaluationsByGeneration are equal
 
-PROBLEMS = [10]
+PROBLEMS = [5, 10, 20]
 
 
 def run_moeda(L, populationSize, use_archive):
@@ -110,12 +110,12 @@ def q2a(run=False, name="run.json"):
 def q2b(run=False, name="run.json"):
     result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
               "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
-    variants = ["normal"]
+    variants = ["archive"]
     precisions = [0.001, 0.00001]
     for problem in PROBLEMS:
         plt.figure()
         for idx, ea in enumerate(variants):
-            precision = 0.001 # precisions[idx]
+            precision = 0.0005 # precisions[idx]
             plt.title(ea+": L="+str(problem))
             plt.yscale('log')
             last_val = -1.0
@@ -234,9 +234,11 @@ def q3(run=False, name="run01", archive=True):
 
 
 #q2a(True, "run06.json")
-q2b(True, "run17.json")
+q2b(True, "run18.json")
 #run_moeda(20, 100, True)
 
 # 11 contains correct version of L=5 without archive (p=0.001)
 # 15 contains correct versions of L=10, L=20 without archive (p=0.001)
 # 16 contains versions of all L with elitist archive, p=0.001
+# 17 contains L=20 without archive (p=0.001) but then not 1040
+# 18 should contain versions of all L with elitist archive, p=0.0005
