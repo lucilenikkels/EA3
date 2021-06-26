@@ -76,8 +76,8 @@ def summary(p_evals, p_fitness):
 
 def q2a(run=False, name="run.json"):
     if run:
-        fitness, evals, xcoords, ycoords = run_reliably()
         fitness_archive, evals_archive, xcoords_a, ycoords_a = run_reliably(use_archive=True)
+        fitness, evals, xcoords, ycoords = run_reliably()
         results = {"normal": {"fitness": fitness, "evals": evals, "xs": xcoords, "ys": ycoords},
                    "archive": {"fitness": fitness_archive, "evals": evals_archive, "xs": xcoords_a, "ys": ycoords_a}}
         with open("results/a/"+name, "w") as f:
@@ -160,8 +160,8 @@ def q2b(run=False, name="run.json"):
     plt.show()
 
 
-#q2a(False, "run05.json")
-q2b(True, "run14.json")
+#q2a(True, "run06.json")
+q2b(True, "run15.json")
 #run_moeda(20, 100, True)
 
 # 11 contains correct version of L=5 without archive

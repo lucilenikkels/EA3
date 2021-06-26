@@ -67,17 +67,21 @@ class MOEDA:
         '''
         # Stored if the solution dominates at least one other
         dominated = False
+        newArchive = set([])
         for elite in self.elitistArchive:
             sol_dominates = dominates(solution.fitness, elite.fitness)
             if sol_dominates == 1:
-                self.elitistArchive.add(solution)
-                break
-            elif sol_dominates == -1:
-                dominated = True
+                newArchive.add(solution)
+            else:
+                newArchive.add(elite)
+                if sol_dominates == -1:
+                    dominated = True
 
         # Stored also if the solution is not dominated by any other
         if not dominated:
-            self.elitistArchive.add(solution)
+            newArchive.add(solution)
+
+        self.elitistArchive = newArchive
 
 
     def crowdingDistanceAssignment(self, solutions):
