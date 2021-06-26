@@ -10,7 +10,7 @@ import numpy as np
 #print('#feval:', EA.numberOfEvaluationsByGeneration) #print array of #feval
 #sizes of EA.hyperVolumeByGeneration and EA.numberOfEvaluationsByGeneration are equal
 
-PROBLEMS = [5, 15, 20]
+PROBLEMS = [5, 10, 20]
 
 
 def run_moeda(L, populationSize, use_archive):
@@ -120,7 +120,7 @@ def q2b(run=False, name="run.json"):
             plt.yscale('log')
             last_val = -1.0
             res = 0.0
-            size = 1
+            size = 2
             if run:
                 while abs(res-last_val) > precision and size != 9999:
                     last_val = res
