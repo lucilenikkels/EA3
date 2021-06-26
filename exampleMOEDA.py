@@ -200,8 +200,8 @@ def q3(group_sizes, run=False, name="run01", archive=True):
     fig, axs = plt.subplots(1, 3)
     for i, problem in enumerate(group_problems):
         ax = axs[i]
-        ax.title("L=" + str(problem))
-        ax.yscale('log')
+        ax.set_title("L=" + str(problem))
+        ax.set_yscale('log')
         if run:
             p_fitness, p_evals, _, _ = run_reliably(5, problem, group_sizes[i], archive)
             fitness, evals, std = summary(p_evals, p_fitness)
