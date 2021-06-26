@@ -111,13 +111,13 @@ def q2b(run=False, name="run.json"):
     result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
               "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
     variants = ["archive"]
-    precisions = [0.001, 0.00001]
+    precisions = [0.001, 0.0002]
     for problem in PROBLEMS:
         plt.figure()
+        plt.title("L="+str(problem))
+        plt.yscale('log')
         for idx, ea in enumerate(variants):
-            precision = 0.0005 # precisions[idx]
-            plt.title(ea+": L="+str(problem))
-            plt.yscale('log')
+            precision = 0.0002 # precisions[idx]
             last_val = -1.0
             res = 0.0
             size = 2
@@ -152,16 +152,16 @@ def q2b(run=False, name="run.json"):
                         lb = size
                     with open("results/b/"+name, "w") as f:
                         json.dump(result, f, indent=4)
+                plt.scatter(result[ea][problem]["sizes"], result[ea][problem]["means"], label=ea)
             else:
                 with open("results/b/" + name, "r") as f:
                     result = json.load(f)
-            # plt.scatter(result[ea][str(problem)]["sizes"], result[ea][str(problem)]["means"], label=ea)
+                plt.scatter(result[ea][str(problem)]["sizes"], result[ea][str(problem)]["means"], label=ea)
         plt.legend()
     plt.show()
 
 
 def q2c(run=False, name="run.json"):
-    sizes = [8, 12, 320]
     eas = [{name: "normal", sizes: [288, 1040, 2866]}, {name: "archive", sizes: [8, 12, 320]}]
     result = {'normal': {L: {} for L in PROBLEMS}, 'archive': {L: {} for L in PROBLEMS}}
     fig, axs = plt.subplots(1, 3)
@@ -197,15 +197,14 @@ def q2c(run=False, name="run.json"):
 def q3(group_sizes, run=False, name="run01", archive=True):
     group_problems = [15, 30, 60]
     result = {L: {} for L in group_problems}
-    #fig, axs = plt.subplots(1, 3)
+    fig, axs = plt.subplots(1, 3)
     for i, problem in enumerate(group_problems):
-        #ax = axs[i]
-        #ax.set_title("L=" + str(problem))
-        #ax.set_yscale('log')
+        ax = axs[i]
+        ax.set_title("L=" + str(problem))
+        ax.set_yscale('log')
         if run:
             p_fitness, p_evals, _, _ = run_reliably(1, problem, group_sizes[i], archive)
             fitness, evals, std = summary(p_evals, p_fitness)
-            print(fitness)
             result[problem]["xs"] = evals
             result[problem]["means"] = fitness
             result[problem]["stds"] = std
@@ -222,27 +221,27 @@ def q3(group_sizes, run=False, name="run01", archive=True):
             else:
                 with open("results/group/" + name + ".json", "r") as f:
                     result = json.load(f)
-        #ax.plot(result[problem]["xs"], result[problem]["means"], label="archive="+str(archive))
-        #upper = []
-        #lower = []
-        #for y in range(len(result[problem]["means"])):
-        #    upper.append(result[problem]["means"][y] + result[problem]["stds"][y])
-        #    lower.append(result[problem]["means"][y] - result[problem]["stds"][y])
-        #ax.fill_between(result[problem]["xs"], upper, lower, alpha=0.3)
-        #ax.legend()
-    #plt.show()
+        ax.plot(result[problem]["xs"], result[problem]["means"], label="archive="+str(archive))
+        upper = []
+        lower = []
+        for y in range(len(result[problem]["means"])):
+            upper.append(result[problem]["means"][y] + result[problem]["stds"][y])
+            lower.append(result[problem]["means"][y] - result[problem]["stds"][y])
+        ax.fill_between(result[problem]["xs"], upper, lower, alpha=0.3)
+        ax.legend()
+    plt.show()
 
 
 #q2a(True, "run06.json")
-#q2b(True, "run18.json")
-#run_moeda(20, 100, True)
-lst = [True, False]
+q2b(True, "run19.json")
+
 sizes = [[116, 1028, 5552], [1987, 4610, 9854]]
-for idx, b in enumerate(lst):
-    q3(sizes[idx], True, "run01", b)
+#for idx, b in enumerate([True, False]):
+#    q3(sizes[idx], True, "run01", b)
 
 # 11 contains correct version of L=5 without archive (p=0.001)
 # 15 contains correct versions of L=10, L=20 without archive (p=0.001)
 # 16 contains versions of all L with elitist archive, p=0.001
 # 17 contains L=20 without archive (p=0.001) but then not 1040
 # 18 should contain versions of all L with elitist archive, p=0.0005
+# 19 should contain versions of all L with elitist archive, p=0.0002
