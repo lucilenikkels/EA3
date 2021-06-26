@@ -55,9 +55,9 @@ def sort_convergence(evals, fitness):
 
 
 def summary(p_evals, p_fitness):
-    f_evals = [item for sublist in p_evals for item in sublist]
-    f_fitness = [item for sublist in p_fitness for item in sublist]
-    evals, fitness = sort_convergence(f_evals, f_fitness)
+    #f_evals = [item for sublist in p_evals for item in sublist]
+    #f_fitness = [item for sublist in p_fitness for item in sublist]
+    evals, fitness = sort_convergence(p_evals, p_fitness)
     eval_final = []
     fitness_final = []
     stds = []
@@ -203,7 +203,7 @@ def q3(group_sizes, run=False, name="run01", archive=True):
         #ax.set_title("L=" + str(problem))
         #ax.set_yscale('log')
         if run:
-            p_fitness, p_evals, _, _ = run_reliably(5, problem, group_sizes[i], archive)
+            p_fitness, p_evals, _, _ = run_reliably(1, problem, group_sizes[i], archive)
             fitness, evals, std = summary(p_evals, p_fitness)
             result[problem]["xs"] = evals
             result[problem]["means"] = fitness
