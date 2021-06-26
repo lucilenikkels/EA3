@@ -14,112 +14,147 @@ PROBLEMS = [20]
 
 
 def run_moeda(L, populationSize, use_archive):
-	EA = MOEDA(populationSize=populationSize,
-			   numberOfVariables=L,
-			   numberOfEvaluations=10 ** 4,
-			   fitnessFunction='knapsack',
-			   selection=variation.selection, variation_model=variation.marginalProductModel,
-			   mutation=variation.mutation,
-			   tournamentSize=2, mutationProb='auto',
-			   randomSeed=None, elitistArchive=use_archive)
-	EA.evolve()  # Run algorithm
-	xs, ys = EA.get_best_front(int(10 ** 4/populationSize)-1)
-	return EA.hyperVolumeByGeneration, EA.numberOfEvaluationsByGeneration, xs, ys
+    EA = MOEDA(populationSize=populationSize,
+               numberOfVariables=L,
+               numberOfEvaluations=10 ** 4,
+               fitnessFunction='knapsack',
+               selection=variation.selection, variation_model=variation.marginalProductModel,
+               mutation=variation.mutation,
+               tournamentSize=2, mutationProb='auto',
+               randomSeed=None, elitistArchive=use_archive)
+    EA.evolve()  # Run algorithm
+    xs, ys = EA.get_best_front(int(10 ** 4/populationSize)-1)
+    return EA.hyperVolumeByGeneration, EA.numberOfEvaluationsByGeneration, xs, ys
 
 
 def run_reliably(reps=5, L=20, populationSize=100, use_archive=False):
-	volumes = []
-	evals = []
-	x_coords = []
-	y_coords = []
-	for i in range(reps):
-		print("Run "+str(i+1)+" out of "+str(reps)+" (L="+str(L)+", pop="+str(populationSize)+", archive="+str(use_archive)+")")
-		vs, es, fx_coords, fy_coords = run_moeda(L, populationSize, use_archive)
-		volumes.append(vs)
-		evals.append(es)
-		x_coords = x_coords + list(fx_coords)
-		y_coords = y_coords + list(fy_coords)
-	return volumes, evals, x_coords, y_coords
+    volumes = []
+    evals = []
+    x_coords = []
+    y_coords = []
+    for i in range(reps):
+        print("Run "+str(i+1)+" out of "+str(reps)+" (L="+str(L)+", pop="+str(populationSize)+", archive="+str(use_archive)+")")
+        vs, es, fx_coords, fy_coords = run_moeda(L, populationSize, use_archive)
+        volumes.append(vs)
+        evals.append(es)
+        x_coords = x_coords + list(fx_coords)
+        y_coords = y_coords + list(fy_coords)
+    return volumes, evals, x_coords, y_coords
+
+
+def sort_convergence(evals, fitness):
+    evals_sorted = []
+    fitness_sorted = []
+    while len(evals) > 0:
+        ind = evals.index(min(evals))
+        evals_sorted.append(evals[ind])
+        fitness_sorted.append(fitness[ind])
+        del evals[ind]
+        del fitness[ind]
+    return evals_sorted, fitness_sorted
+
+
+def summary(p_evals, p_fitness):
+    evals, fitness = sort_convergence(p_evals, p_fitness)
+    eval_final = []
+    fitness_final = []
+    stds = []
+    start_ind = 0
+    counter = 0
+    for i in range(len(evals)):
+        counter += 1
+        if counter == int(len(evals) / 10) or i == len(evals) - 1:
+            eval_final.append(np.mean(evals[start_ind:i]))
+            mean = np.mean(fitness[start_ind:i])
+            fitness_final.append(mean)
+            variance = np.mean([(f - mean) ** 2 for f in fitness[start_ind:i]])
+            stds.append(math.sqrt(variance))
+            start_ind = i
+            counter = 0
+    return eval_final, fitness_final, stds
 
 
 def q2a(run=False, name="run.json"):
-	if run:
-		fitness, evals, xcoords, ycoords = run_reliably()
-		fitness_archive, evals_archive, xcoords_a, ycoords_a = run_reliably(use_archive=True)
-		results = {"normal": {"fitness": fitness, "evals": evals, "xs": xcoords, "ys": ycoords},
-				   "archive": {"fitness": fitness_archive, "evals": evals_archive, "xs": xcoords_a, "ys": ycoords_a}}
-		with open("results/a/"+name, "w") as f:
-			json.dump(results, f, indent=4)
-	else:
-		with open("results/a/"+name, "r") as f:
-			results = json.load(f)
-	plt.figure(0)
-	plt.scatter(results["normal"]["evals"], results["normal"]["fitness"], label="W/o archive",
-				color="red", facecolors='none', alpha=1)
-	plt.scatter(results["archive"]["evals"], results["archive"]["fitness"], label="W archive",
-				color="blue", facecolors='none', alpha=1)
-	plt.legend()
-	plt.yscale('log')
-	plt.title("Convergence graph for MOEDA (L=20, pop=100)")
-	plt.xlabel("Evaluations")
-	plt.ylabel("Hypervolume")
-	plt.figure(1)
-	plt.scatter(results["normal"]["xs"], results["normal"]["ys"], label="W/o archive", color="red", facecolors='none', alpha=0.3)
-	plt.scatter(results["archive"]["xs"], results["archive"]["ys"], label="W archive", color="blue", facecolors='none', alpha=0.3)
-	plt.xlabel("f0")
-	plt.ylabel("f1")
-	plt.legend()
-	plt.show()
+    if run:
+        fitness, evals, xcoords, ycoords = run_reliably()
+        fitness_archive, evals_archive, xcoords_a, ycoords_a = run_reliably(use_archive=True)
+        results = {"normal": {"fitness": fitness, "evals": evals, "xs": xcoords, "ys": ycoords},
+                   "archive": {"fitness": fitness_archive, "evals": evals_archive, "xs": xcoords_a, "ys": ycoords_a}}
+        with open("results/a/"+name, "w") as f:
+            json.dump(results, f, indent=4)
+    else:
+        with open("results/a/"+name, "r") as f:
+            results = json.load(f)
+    plt.figure(0)
+    eas = ["normal", "archive"]
+    labels = ["W/o archive", "W archive"]
+    for i in range(len(eas)):
+        evals = [item for sublist in results[eas[i]]["evals"] for item in sublist]
+        fitness = [item for sublist in results[eas[i]]["fitness"] for item in sublist]
+        x_graph, y_graph, std = summary(evals, fitness)
+        plt.plot(x_graph, y_graph, label=labels[i])
+        upper = []
+        lower = []
+        for y in range(len(y_graph)):
+            upper.append(y_graph[y]+std[y])
+            lower.append(y_graph[y]-std[y])
+        plt.fill_between(x_graph, upper, lower, alpha=0.3)
+    plt.legend(fontsize=18)
+    plt.yscale('log')
+    plt.title("Convergence graph for MOEDA (L=20, pop=100)", fontsize=24)
+    plt.xlabel("Evaluations", fontsize=20)
+    plt.ylabel("Hypervolume", fontsize=20)
+    plt.show()
 
 
 def q2b(run=False, name="run.json"):
-	result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
-			  "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
-	variants = ["normal", "archive"]
-	precision = 0.00001
-	for problem in PROBLEMS:
-		for ea in variants:
-			plt.figure()
-			plt.title(ea+": L="+str(problem))
-			plt.yscale('log')
-			last_val = -1.0
-			res = 0.0
-			size = 4
-			while last_val*precision <= abs(res-last_val) and size != 9999:
-				last_val = res
-				size = min(size*2, 9999)
-				fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
-				result[ea][problem]["sizes"].append(size)
-				res = np.mean(fitness)
-				result[ea][problem]["means"].append(res)
-				with open("results/b/"+name, "w") as f:
-					json.dump(result, f, indent=4)
-			prev = result[ea][problem]["means"][-1]
-			if abs(prev-result[ea][problem]["means"][-2]) < 0.0000000000001:
-				ub = result[ea][problem]["sizes"][-2]
-				lb = result[ea][problem]["sizes"][-3]
-				print("They are the same")
-			else:
-				ub = result[ea][problem]["sizes"][-1]
-				lb = result[ea][problem]["sizes"][-2]
-			while ub-lb > 2:
-				size = int((ub+lb)/2)
-				fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
-				res = np.mean(fitness)
-				result[ea][problem]["sizes"].append(size)
-				result[ea][problem]["means"].append(res)
-				if res >= prev-prev*precision:
-					prev = res
-					ub = size
-				else:
-					lb = size
-					prev = res
-				with open("results/b/"+name, "w") as f:
-					json.dump(result, f, indent=4)
-			plt.scatter(result[ea][problem]["sizes"], result[ea][problem]["means"])
-	plt.show()
+    result = {"normal": {L: {"means": [], "sizes": []} for L in PROBLEMS},
+              "archive": {L: {"means": [], "sizes": []} for L in PROBLEMS}}
+    variants = ["normal", "archive"]
+    precision = 0.001
+    for problem in PROBLEMS:
+        for ea in variants:
+            plt.figure()
+            plt.title(ea+": L="+str(problem))
+            plt.yscale('log')
+            last_val = -1.0
+            res = 0.0
+            size = 4
+            while last_val*precision <= abs(res-last_val) and size != 9999:
+                last_val = res
+                size = min(size*2, 9999)
+                fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
+                result[ea][problem]["sizes"].append(size)
+                res = np.mean(fitness)
+                result[ea][problem]["means"].append(res)
+                with open("results/b/"+name, "w") as f:
+                    json.dump(result, f, indent=4)
+            prev = result[ea][problem]["means"][-1]
+            if abs(prev-result[ea][problem]["means"][-2]) < 0.0000000000001:
+                ub = result[ea][problem]["sizes"][-2]
+                lb = result[ea][problem]["sizes"][-3]
+                print("They are the same")
+            else:
+                ub = result[ea][problem]["sizes"][-1]
+                lb = result[ea][problem]["sizes"][-2]
+            while ub-lb > 2:
+                size = int((ub+lb)/2)
+                fitness, evals, _, _ = run_reliably(5, problem, size, ea == "archive")
+                res = np.mean(fitness)
+                result[ea][problem]["sizes"].append(size)
+                result[ea][problem]["means"].append(res)
+                if res >= prev-prev*precision:
+                    prev = res
+                    ub = size
+                else:
+                    lb = size
+                    prev = res
+                with open("results/b/"+name, "w") as f:
+                    json.dump(result, f, indent=4)
+            plt.scatter(result[ea][problem]["sizes"], result[ea][problem]["means"])
+    plt.show()
 
 
-#q2a(True, "run06.json")
-q2b(True, "run08.json")
+#q2a(False, "run05.json")
+q2b(True, "run09.json")
 #run_moeda(20, 100, True)
