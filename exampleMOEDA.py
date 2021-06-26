@@ -10,7 +10,7 @@ import numpy as np
 #print('#feval:', EA.numberOfEvaluationsByGeneration) #print array of #feval
 #sizes of EA.hyperVolumeByGeneration and EA.numberOfEvaluationsByGeneration are equal
 
-PROBLEMS = [5, 10, 20]
+PROBLEMS = [10, 20]
 
 
 def run_moeda(L, populationSize, use_archive):
