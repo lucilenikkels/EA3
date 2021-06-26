@@ -233,6 +233,7 @@ def q3(group_sizes, run=False, name="run01", archive=True):
 
 
 #q2a(True, "run06.json")
+q3([1987, 4610, 9854], True, "run01", archive=False)
 q2b(True, "run19.json")
 
 sizes = [[116, 1028, 5552], [1987, 4610, 9854]]
