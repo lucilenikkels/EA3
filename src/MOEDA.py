@@ -65,8 +65,6 @@ class MOEDA:
         Output: updated self.elitistArchive
         #####
         '''
-        obj1, obj2 = solution.fitness
-
         # Stored if the solution dominates at least one other
         dominated = False
         for elite in self.elitistArchive:
