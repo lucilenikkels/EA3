@@ -1,0 +1,26 @@
+TODOs:
+	- Explain why MOEDA without elitist archive diverges (2a)
+During variation and selection, it could be that at some point, not all non-dominated solutions
+fit in the selection for the next generation. One must then discard part of the solutions, which means
+that the elitist front shifts. This could cause the front to become worse, and this is the effect that
+can be observed in \autoref{fig:MOEDA_20_100}.
+	- Explain final choice of epsilon for elitist archive (2b)
+	- Why is population sizing before comparing important? (2b)
+Finding a good performing population size before comparing EA variants is important, first of all,
+because it gives more insight into the runtime and memory complexities of the algorithm. 
+For example, if one has to operate under tight memory constraints, one would be more likely to favour 
+an algorithm that performs adequately with a small population size. In addition, population sizing
+provides insights into the scalability of the EA. From just a few experiments, one could
+make an educated (data-driven) guess as to what the relationship of the population size w.r.t. 
+the input size could be. For example, \autoref{tab:} suggests that the variant without elitist archive
+has a linear relationship between input size and population size, whereas the variant with elitist
+archive appears to have an exponential relationship between these variables. Finally, population sizing
+allows the algorithm to perform at its best, given the other constraints and thus results in a fairer
+comparison. For the comparison between MOEDA with and without elitist archive, for example, \autoref{fig}
+showed that the variant with elitist archive strictly outperforms the variant without, but these
+results are skewed because a population size of 100 is in the benefit of the variant with elitist
+archive. Given the same function evaluation constraint, the variant without elitist archive is shown
+to actually achieve approximately equal results in \autoref{}. 
+	- Does elitist archive help MOEDA?
+The answer to the question whether the addition of an elitist archive to MOEDA is beneficial is that
+it depends. 
